@@ -28,14 +28,11 @@ class Factory
 
         define_method :initialize do |*value|
           raise ArgumentError, 'ArgumentError' if key.count != value.count
-          key.zip(value).each {|key, value| send("#{key}=", value)}
+
+          key.zip(value).each { |key, value| send("#{key}=", value) }
         end
 
         class_eval(&block) if block_given?
-
-        def map_instance_variables
-          instance_variables.map { |variable| instance_variable_get(variable) }
-        end
 
         def ==(obj)
           self.class == obj.class && self.map_instance_variables == obj.map_instance_variables
@@ -50,14 +47,48 @@ class Factory
         end
 
         def dig(*args)
-          
+          map_instance_keys_variables.dig(*args)
         end
 
+        def each(&block)
+          map_instance_variables.each(&block)
+        end
 
+        def each_pair(&block)
+          map_instance_keys_variables.each_pair(&block)
+        end
 
-        class_eval(&block) if block_given?
+        def length
+          instance_variables.length
+        end
+
+        def members
+          map_instance_keys_variables.keys
+        end
+
+        def select(&block)
+          map_instance_variables.select(&block)
+        end
+
+        def to_a
+          map_instance_variables
+        end
+
+        def values_at(*keys)
+          keys.map { |key| map_instance_variables[key] }
+        end
+
+        alias_method :size, :length
+
+        protected
+        def map_instance_variables
+          instance_variables.map { |variable| instance_variable_get(variable) }
+        end
+
+        def map_instance_keys_variables
+          Hash[instance_variables.map { |variable| [variable.to_s.delete('@').to_sym, instance_variable_get(variable)] }]
+        end
       end
     end
-  end    
+  end
 end
-

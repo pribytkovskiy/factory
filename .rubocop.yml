@@ -1,0 +1,17 @@
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Metrics/LineLength:
+  Max: 110
+
+Style/Documentation:
+  Enabled: false
+
+Metrics/MethodLength:
+  Max: 30
+
+FileName:
+  Enabled: false
+
+AllCops:
+  TargetRubyVersion: 2.5.3
