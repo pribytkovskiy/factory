@@ -81,12 +81,13 @@ class Factory
         alias_method :size, :length
 
         protected
+
         def map_instance_variables
           instance_variables.map { |variable| instance_variable_get(variable) }
         end
 
         def map_instance_keys_variables
-          Hash[instance_variables.map { |variable| [variable.to_s.delete('@').to_sym, instance_variable_get(variable)] }]
+          Hash[instance_variables.map { |var| [var.to_s.delete('@').to_sym, instance_variable_get(var)] }]
         end
       end
     end
