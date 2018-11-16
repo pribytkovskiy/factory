@@ -32,8 +32,6 @@ class Factory
           key.zip(value).each { |key, value| send("#{key}=", value) }
         end
 
-        class_eval(&block) if block_given?
-
         def ==(obj)
           self.class == obj.class && self.map_instance_variables == obj.map_instance_variables
         end
@@ -78,6 +76,8 @@ class Factory
           keys.map { |key| map_instance_variables[key] }
         end
 
+        class_eval(&block) if block_given?
+
         alias_method :size, :length
 
         protected
@@ -87,7 +87,9 @@ class Factory
         end
 
         def map_instance_keys_variables
-          Hash[instance_variables.map { |var| [var.to_s.delete('@').to_sym, instance_variable_get(var)] }]
+          #p Hash[instance_variables.map { |var| [var.to_s.delete('@').to_sym, instance_variable_get(var)] }]
+        
+          p instance_variables.zip { |variable| instance_variable_get(variable) }
         end
       end
     end

@@ -1,4 +1,4 @@
-require '../lib/factory.rb'
+require './lib/factory.rb'
 factory = Factory.new(:car, :model) do
   def hello
     "Wrum wrum #{car}!"
