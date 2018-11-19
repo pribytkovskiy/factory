@@ -37,7 +37,7 @@ class Factory
         end
 
         def [](key)
-          (key.is_a? Numeric) ? map_instance_variables[key] : instance_variable_get("@#{key}")
+          (key.is_a? Integer) ? map_instance_variables[key] : instance_variable_get("@#{key}")
         end
 
         def []=(key, value)
@@ -45,7 +45,7 @@ class Factory
         end
 
         def dig(*args)
-          map_instance_keys_variables.dig(*args)
+          args.inject(self) { |key, value| key[value].nil? ? (return nil) : key[value] }
         end
 
         def each(&block)
@@ -87,9 +87,7 @@ class Factory
         end
 
         def map_instance_keys_variables
-          #p Hash[instance_variables.map { |var| [var.to_s.delete('@').to_sym, instance_variable_get(var)] }]
-        
-          p instance_variables.zip { |variable| instance_variable_get(variable) }
+          Hash[instance_variables.map { |variable| variable.to_s.delete('@').to_sym }.zip(to_a)]
         end
       end
     end

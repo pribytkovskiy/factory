@@ -76,7 +76,6 @@ RSpec.describe 'Factory' do
 
   it 'dig works as expected' do
     Customer = Factory.new(:a)
-
     c = Customer.new(Customer.new(b: [1, 2, 3]))
 
     expect(c.dig(:a, :a, :b, 0)).to eq(1)
