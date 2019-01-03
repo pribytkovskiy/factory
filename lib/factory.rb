@@ -14,3 +14,82 @@
 # - to_a
 # - values_at
 # - ==, eql?
+
+class Factory
+  class << self
+    def new(*key, &block)
+      const_set(key.shift.capitalize, class_new(*key, &block)) if key.first.is_a?(String)
+      class_new(*key, &block)
+    end
+
+    def class_new(*key, &block)
+      Class.new do
+        attr_accessor(*key)
+
+        define_method :initialize do |*value|
+          raise ArgumentError, 'ArgumentError' if key.count != value.count
+
+          key.zip(value).each { |key, value| send("#{key}=", value) }
+        end
+
+        def ==(obj)
+          self.class == obj.class && self.map_instance_variables == obj.map_instance_variables
+        end
+
+        def [](key)
+          (key.is_a? Integer) ? map_instance_variables[key] : instance_variable_get("@#{key}")
+        end
+
+        def []=(key, value)
+          instance_variable_set("@#{key}", value)
+        end
+
+        def dig(*args)
+          args.inject(self) { |key, value| key[value].nil? ? (return nil) : key[value] }
+        end
+
+        def each(&block)
+          map_instance_variables.each(&block)
+        end
+
+        def each_pair(&block)
+          map_instance_keys_variables.each_pair(&block)
+        end
+
+        def length
+          instance_variables.length
+        end
+
+        def members
+          map_instance_keys_variables.keys
+        end
+
+        def select(&block)
+          map_instance_variables.select(&block)
+        end
+
+        def to_a
+          map_instance_variables
+        end
+
+        def values_at(*keys)
+          keys.map { |key| map_instance_variables[key] }
+        end
+
+        class_eval(&block) if block_given?
+
+        alias_method :size, :length
+
+        protected
+
+        def map_instance_variables
+          instance_variables.map { |variable| instance_variable_get(variable) }
+        end
+
+        def map_instance_keys_variables
+          Hash[instance_variables.map { |variable| variable.to_s.delete('@').to_sym }.zip(to_a)]
+        end
+      end
+    end
+  end
+end
